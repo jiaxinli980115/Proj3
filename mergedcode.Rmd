@@ -1,0 +1,138 @@
+---
+title: 'y'
+author: "Bernadette Gostelow"
+date: "4/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+df<- read_csv("/Users/bernadettegostelow/Downloads/download_data_fincen_files/download_transactions_map.csv")
+df$begin_date<- as.POSIXlt(df$begin_date, format= "%b %d, %Y")
+df$end_date<- as.POSIXlt(df$end_date, format= "%b %d, %Y")
+df$begin_date<- as.Date(df$begin_date)
+df$end_date<- as.Date(df$end_date)
+df$amount_transactions<- as.numeric(df$amount_transactions)
+df$number_transactions[is.na(df$number_transactions)] <- 1
+df$duration<- df$end_date - df$begin_date
+nonswap<- df[which(df$duration >= 0), ]
+
+swap<- df[which(df$duration < 0), ]
+tmp <- swap$begin_date
+swap$begin_date <- swap$end_date
+swap$end_date <- tmp
+swap$duration<- swap$end_date - swap$begin_date
+df$duration<- df$end_date - df$begin_date
+
+df<- rbind(nonswap, swap)
+
+df1<- ggplot(data = df, aes(x = begin_date, y = number_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+df2<- ggplot(data = df, aes(x = begin_date, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+df3<- ggplot(data = df, aes(x = duration, y =number_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+df4<- ggplot(data = df, aes(x = duration, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+df5<- ggplot(data = df, aes(x = begin_date, y =duration))+
+  geom_line(color = "#00AFBB", size = 1)
+print(df5)
+```
+
+```{r}
+ams<- df[df$originator_bank %like% "Amsterdam Trade", ]
+ams$originator_bank<- "amstrade"
+ams$date<- format(as.Date(ams$begin_date), "%Y-%m")
+expo<- df[df$originator_bank %like% "Expobank", ]
+expo$originator_bank<- "expo"
+expo$date<- format(as.Date(expo$begin_date), "%Y-%m")
+db<- df[df$originator_bank %like% "Deutsche", ]
+db$originator_bank<- "db"
+db$date<- format(as.Date(db$begin_date), "%Y-%m")
+rig<- df[df$originator_bank %like% "Rigensis", ]
+rig$originator_bank<- "rig"
+rig$date<- format(as.Date(rig$begin_date), "%Y-%m")
+rosbank<- df[df$originator_bank %like% "Rosbank", ]
+rosbank$originator_bank<- "rosbank"
+rosbank$date<- format(as.Date(rosbank$begin_date), "%Y-%m")
+jpmc1<- df[df$originator_bank %like% "JP", ]
+jpmc2<- df[df$originator_bank %like% "Jpmc", ]
+jpmc<- rbind(jpmc1, jpmc2)
+jpmc$originator_bank<- "jpmc"
+jpmc$date<- format(as.Date(jpmc$begin_date), "%Y-%m")
+
+ams1<- ggplot(data = ams, aes(x = begin_date, y = number_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+ams2<- ggplot(data = ams, aes(x = begin_date, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+ams3<- ggplot(data = ams, aes(x = begin_date, y =duration))+
+  geom_line(color = "#00AFBB", size = 1)
+
+expo1<- ggplot(data = expo, aes(x = begin_date, y = number_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+expo2<- ggplot(data = expo, aes(x = begin_date, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+expo3<- ggplot(data = expo, aes(x = begin_date, y =duration))+
+  geom_line(color = "#00AFBB", size = 1)
+
+db1<- ggplot(data = db, aes(x = begin_date, y = number_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+db2<- ggplot(data = db, aes(x = begin_date, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+db3<- ggplot(data = db, aes(x = begin_date, y =duration))+
+  geom_line(color = "#00AFBB", size = 1)
+
+rig1<- ggplot(data = rig, aes(x = begin_date, y = number_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+rig2<- ggplot(data = rig, aes(x = begin_date, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+rig3<- ggplot(data = rig, aes(x = begin_date, y =duration))+
+  geom_line(color = "#00AFBB", size = 1)
+
+rosbank1<- ggplot(data = rosbank, aes(x = begin_date, y = number_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+rosbank2<- ggplot(data = rosbank, aes(x = begin_date, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+rosbank3<- ggplot(data = rosbank, aes(x = begin_date, y =duration))+
+  geom_line(color = "#00AFBB", size = 1)
+
+jpmc1<- ggplot(data = jpmc, aes(x = begin_date, y = number_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+jpmc2<- ggplot(data = jpmc, aes(x = begin_date, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+jpmc3<- ggplot(data = jpmc, aes(x = begin_date, y =amount_transactions))+
+  geom_line(color = "#00AFBB", size = 1)
+```
+
+```{r}
+pdf<- rbind(ams, db, expo, rosbank, rig, jpmc)
+pdf$countryfrom <- countrycode(pdf$originator_bank_country, origin = 'country.name', destination = 'cown')
+pdf$countryto <- countrycode(pdf$beneficiary_bank_country, origin = 'country.name', destination = 'cown')
+#aggregate data by month
+pdf$datenumber<- as.integer(gsub(pattern = "-", replacement="", x = pdf$date))
+pdff<- aggregate(pdf$amount_transactions, by=list(pdf$datenumber, pdf$beneficiary_bank, pdf$beneficiary_bank_country, pdf$originator_bank, pdf$originator_bank_country), FUN="sum")
+colnames(pdff) <- c('date', 'bankto', 'countryto', 'bankfrom', 'countryfrom', 'amount')
+
+```
